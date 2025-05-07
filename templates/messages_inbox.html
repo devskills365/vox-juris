@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h2 class="text-2xl font-bold mb-6">Boîte de Réception</h2>
+    {% if conversations %}
+        <div class="grid grid-cols-1 gap-4">
+            {% for conv in conversations %}
+                <a href="{{ url_for('messages', request_id=conv.id) }}" class="block bg-white p-4 rounded-lg shadow-md hover:bg-gray-50">
+                    <p><strong>Demande #{{ conv.id }} - {{ conv.domain }}</strong></p>
+                    <p><strong>Statut :</strong> {{ conv.status }}</p>
+                    <p><strong>Avec :</strong> {{ conv.professional.name if current_user.role == 'citizen' else conv.user.name }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-700">Aucune conversation active.</p>
+    {% endif %}
+</div>
+{% endblock %}

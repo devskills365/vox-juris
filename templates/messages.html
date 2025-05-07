@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h2 class="text-2xl font-bold mb-6">Messagerie pour la Demande #{{ request_obj.id }}</h2>
+    <p><strong>Domaine :</strong> {{ request_obj.domain }}</p>
+    <p><strong>Statut :</strong> {{ request_obj.status }}</p>
+    <div class="flex items-center mb-2">
+        <p><strong>Soumis par :</strong> {{ request_obj.user.name }}</p>
+        {% if request_obj.user.profile_picture %}
+            <img src="{{ url_for('static', filename=request_obj.user.profile_picture) }}" alt="Photo de {{ request_obj.user.name }}" class="w-10 h-10 rounded-full ml-2">
+        {% else %}
+            <div class="w-10 h-10 rounded-full bg-gray-300 ml-2 flex items-center justify-center text-gray-600">
+                {{ request_obj.user.name[0] }}
+            </div>
+        {% endif %}
+    </div>
+    {% if request_obj.professional %}
+        <div class="flex items-center mb-2">
+            <p><strong>Accepté par :</strong> {{ request_obj.professional.name }}</p>
+            {% if request_obj.professional.profile_picture %}
+                <img src="{{ url_for('static', filename=request_obj.professional.profile_picture) }}" alt="Photo de {{ request_obj.professional.name }}" class="w-10 h-10 rounded-full ml-2">
+            {% else %}
+                <div class="w-10 h-10 rounded-full bg-gray-300 ml-2 flex items-center justify-center text-gray-600">
+                    {{ request_obj.professional.name[0] }}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+    <div class="bg-white p-4 rounded-lg shadow-md mb-6 max-h-96 overflow-y-auto">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="mb-4 {% if msg.sender_id == current_user.id %}text-right{% else %}text-left{% endif %}">
+                    <div class="flex items-center {% if msg.sender_id == current_user.id %}justify-end{% else %}justify-start{% endif %}">
+                        {% if msg.sender.profile_picture %}
+                            <img src="{{ url_for('static', filename=msg.sender.profile_picture) }}" alt="Photo de {{ msg.sender.name }}" class="w-8 h-8 rounded-full {% if msg.sender_id == current_user.id %}ml-2{% else %}mr-2{% endif %}">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 {% if msg.sender_id == current_user.id %}ml-2{% else %}mr-2{% endif %}">
+                                {{ msg.sender.name[0] }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <p class="text-sm text-gray-500">{{ msg.sent_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            <div class="inline-block p-2 rounded-lg {% if msg.sender_id == current_user.id %}bg-blue-100{% else %}bg-gray-100{% endif %}">
+                                <p><strong>{{ msg.sender.name }} :</strong></p>
+                                {% if msg.content %}
+                                    <p>{{ msg.content }}</p>
+                                {% endif %}
+                                {% if msg.audio_path %}
+                                    <audio controls class="mt-2">
+                                        <source src="{{ url_for('static', filename=msg.audio_path) }}" type="audio/mpeg">
+                                        Votre navigateur ne prend pas en charge l'élément audio.
+                                    </audio>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-700">Aucun message pour cette demande.</p>
+        {% endif %}
+    </div>
+    {% if request_obj.status in ['accepted', 'resolved'] %}
+        <form method="POST" enctype="multipart/form-data" class="mb-6">
+            <div class="mb-4">
+                <label for="content" class="block text-gray-700">Message Texte</label>
+                <textarea id="content" name="content" class="w-full p-2 border rounded" rows="4"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Message Audio</label>
+                <div class="flex space-x-2 mb-2">
+                    <button type="button" id="messageRecordButton" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Enregistrer</button>
+                    <button type="button" id="messageStopButton" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700" disabled>Arrêter</button>
+                </div>
+                <audio id="messageAudioPreview" controls hidden class="w-full"></audio>
+                <input type="file" id="messageRecordedAudio" name="messageRecordedAudio" accept=".mp3,.wav" hidden>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Envoyer</button>
+        </form>
+    {% else %}
+        <p class="text-gray-700">La messagerie est disponible une fois la demande acceptée.</p>
+    {% endif %}
+    <a href="{{ url_for('messages_inbox') }}" class="text-blue-600 hover:underline">Retour à la boîte de réception</a>
+</div>
+<script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
+{% endblock %}

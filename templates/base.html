@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vox Juris</title>
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4 text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-xl font-bold">Vox Juris</a>
+            <div>
+                {% if current_user.is_authenticated %}
+                    <span class="mr-4">Bienvenue, {{ current_user.name }}</span>
+                    <a href="{{ url_for('profile') }}" class="mr-4">Profil</a>
+                    {% if current_user.role == 'citizen' %}
+                        <a href="{{ url_for('submit_request') }}" class="mr-4">Soumettre une Demande</a>
+                        <a href="{{ url_for('my_requests') }}" class="mr-4">Mes Demandes</a>
+                        <a href="{{ url_for('messages_inbox') }}" class="mr-4">Messagerie</a>
+                    {% elif current_user.role == 'professional' %}
+                        <a href="{{ url_for('view_requests') }}" class="mr-4">Voir les Demandes</a>
+                        <a href="{{ url_for('messages_inbox') }}" class="mr-4">Messagerie</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="mr-4">Déconnexion</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="mr-4">Connexion</a>
+                    <a href="{{ url_for('register') }}">Inscription</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <main class="container mx-auto mt-8">
+        {% block content %}{% endblock %}
+    </main>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="container mx-auto mt-4">
+                {% for message in messages %}
+                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>

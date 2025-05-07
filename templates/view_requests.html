@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h2 class="text-2xl font-bold mb-6">Demandes Vocales</h2>
+    <form method="GET" action="{{ url_for('view_requests') }}" class="mb-6">
+        <div class="flex space-x-4">
+            <div>
+                <label for="domain" class="block text-gray-700">Filtrer par Domaine</label>
+                <select id="domain" name="domain" class="p-2 border rounded">
+                    <option value="">Tous</option>
+                    <option value="Immobilier" {% if request.args.get('domain') == 'Immobilier' %}selected{% endif %}>Immobilier</option>
+                    <option value="Famille" {% if request.args.get('domain') == 'Famille' %}selected{% endif %}>Famille</option>
+                    <option value="Travail" {% if request.args.get('domain') == 'Travail' %}selected{% endif %}>Travail</option>
+                    <option value="Pénal" {% if request.args.get('domain') == 'Pénal' %}selected{% endif %}>Pénal</option>
+                    <option value="Autre" {% if request.args.get('domain') == 'Autre' %}selected{% endif %}>Autre</option>
+                </select>
+            </div>
+            <div>
+                <label for="status" class="block text-gray-700">Filtrer par Statut</label>
+                <select id="status" name="status" class="p-2 border rounded">
+                    <option value="">Tous</option>
+                    <option value="open" {% if request.args.get('status') == 'open' %}selected{% endif %}>Ouvert</option>
+                    <option value="accepted" {% if request.args.get('status') == 'accepted' %}selected{% endif %}>Accepté</option>
+                    <option value="resolved" {% if request.args.get('status') == 'resolved' %}selected{% endif %}>Résolu</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Filtrer</button>
+            </div>
+        </div>
+    </form>
+    {% if requests %}
+        <div class="grid grid-cols-1 gap-4">
+            {% for req in requests %}
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="flex items-center mb-2">
+                        {% if req.user.profile_picture %}
+                            <img src="{{ url_for('static', filename=req.user.profile_picture) }}" alt="Photo de {{ req.user.name }}" class="w-10 h-10 rounded-full mr-2">
+                        {% else %}
+                            <div class="w-10 h-10 rounded-full bg-gray-300 mr-2 flex items-center justify-center text-gray-600">
+                                {{ req.user.name[0] }}
+                            </div>
+                        {% endif %}
+                        <p><strong>Soumis par :</strong> {{ req.user.name }}</p>
+                    </div>
+                    <p><strong>Domaine :</strong> {{ req.domain }}</p>
+                    <p><strong>Statut :</strong> {{ req.status }}</p>
+                    <p><strong>Date :</strong> {{ req.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                    {% if req.description %}
+                        <p><strong>Description :</strong> {{ req.description }}</p>
+                    {% endif %}
+                    {% if req.audio_path %}
+                        <audio controls class="mt-2">
+                            <source src="{{ url_for('static', filename=req.audio_path) }}" type="audio/mpeg">
+                            Votre navigateur ne prend pas en charge l'élément audio.
+                        </audio>
+                    {% endif %}
+                    {% if req.status == 'open' %}
+                        <form method="POST" action="{{ url_for('accept_request', request_id=req.id) }}" class="mt-4">
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Accepter</button>
+                        </form>
+                    {% elif req.status == 'accepted' and req.professional_id == current_user.id %}
+                        <div class="mt-4 space-x-2">
+                            <form method="POST" action="{{ url_for('resolve_request', request_id=req.id) }}" class="inline">
+                                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Marquer comme Résolue</button>
+                            </form>
+                            <a href="{{ url_for('messages', request_id=req.id) }}" class="inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
+                        </div>
+                    {% elif req.status == 'resolved' and req.professional_id == current_user.id %}
+                        <a href="{{ url_for('messages', request_id=req.id) }}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-700">Aucune demande correspondant aux critères.</p>
+    {% endif %}
+</div>
+{% endblock %}

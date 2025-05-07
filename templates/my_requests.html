@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h2 class="text-2xl font-bold mb-6">Mes Demandes</h2>
+    {% if requests %}
+        <div class="grid grid-cols-1 gap-4">
+            {% for req in requests %}
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <p><strong>Domaine :</strong> {{ req.domain }}</p>
+                    <p><strong>Statut :</strong> {{ req.status }}</p>
+                    <p><strong>Date :</strong> {{ req.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                    {% if req.description %}
+                        <p><strong>Description :</strong> {{ req.description }}</p>
+                    {% endif %}
+                    {% if req.audio_path %}
+                        <audio controls class="mt-2">
+                            <source src="{{ url_for('static', filename=req.audio_path) }}" type="audio/mpeg">
+                            Votre navigateur ne prend pas en charge l'élément audio.
+                        </audio>
+                    {% endif %}
+                    {% if req.professional_id %}
+                        <div class="flex items-center mt-2">
+                            <p><strong>Accepté par :</strong> {{ req.professional.name }}</p>
+                            {% if req.professional.profile_picture %}
+                                <img src="{{ url_for('static', filename=req.professional.profile_picture) }}" alt="Photo de {{ req.professional.name }}" class="w-10 h-10 rounded-full ml-2">
+                            {% else %}
+                                <div class="w-10 h-10 rounded-full bg-gray-300 ml-2 flex items-center justify-center text-gray-600">
+                                    {{ req.professional.name[0] }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {% if req.status == 'accepted' %}
+                        <div class="mt-4 space-x-2">
+                            <form method="POST" action="{{ url_for('resolve_request', request_id=req.id) }}" class="inline">
+                                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Confirmer comme Résolue</button>
+                            </form>
+                            <a href="{{ url_for('messages', request_id=req.id) }}" class="inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
+                        </div>
+                    {% elif req.status == 'resolved' %}
+                        <a href="{{ url_for('messages', request_id=req.id) }}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-700">Vous n'avez soumis aucune demande.</p>
+    {% endif %}
+</div>
+{% endblock %}

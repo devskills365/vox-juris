@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h2 class="text-2xl font-bold mb-6">Soumettre une Demande</h2>
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label for="domain" class="block text-gray-700">Domaine Juridique</label>
+                <select id="domain" name="domain" class="w-full p-2 border rounded" required>
+                    <option value="Immobilier">Immobilier</option>
+                    <option value="Famille">Famille</option>
+                    <option value="Travail">Travail</option>
+                    <option value="Pénal">Pénal</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Enregistrement Audio</label>
+                <div class="flex space-x-2 mb-2">
+                    <button type="button" id="recordButton" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Enregistrer</button>
+                    <button type="button" id="stopButton" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700" disabled>Arrêter</button>
+                </div>
+                <audio id="audioPreview" controls hidden class="w-full"></audio>
+                <input type="file" id="recordedAudio" name="recordedAudio" accept=".mp3,.wav" hidden>
+            </div>
+            <div class="mb-4">
+                <label for="audio" class="block text-gray-700">Ou Télécharger un Fichier Audio</label>
+                <input type="file" id="audio" name="audio" accept=".mp3,.wav" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-gray-700">Description Textuelle</label>
+                <textarea id="description" name="description" class="w-full p-2 border rounded" rows="5"></textarea>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">Soumettre</button>
+        </form>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
+{% endblock %}
