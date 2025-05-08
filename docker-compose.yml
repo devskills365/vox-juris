@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./static/uploads:/app/static/uploads
+      - ./static/profile_pictures:/app/static/profile_pictures
+      - ./static/pdfs:/app/static/pdfs
+      - ./instance:/app/instance
+    environment:
+      - FLASK_ENV=production

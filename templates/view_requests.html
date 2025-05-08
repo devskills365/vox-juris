@@ -33,7 +33,7 @@
     {% if requests %}
         <div class="grid grid-cols-1 gap-4">
             {% for req in requests %}
-                <div class="bg-white p-4 rounded-lg shadow-md">
+                <div class="container-bg p-4">
                     <div class="flex items-center mb-2">
                         {% if req.user.profile_picture %}
                             <img src="{{ url_for('static', filename=req.user.profile_picture) }}" alt="Photo de {{ req.user.name }}" class="w-10 h-10 rounded-full mr-2">
@@ -56,20 +56,21 @@
                             Votre navigateur ne prend pas en charge l'élément audio.
                         </audio>
                     {% endif %}
-                    {% if req.status == 'open' %}
-                        <form method="POST" action="{{ url_for('accept_request', request_id=req.id) }}" class="mt-4">
-                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Accepter</button>
-                        </form>
-                    {% elif req.status == 'accepted' and req.professional_id == current_user.id %}
-                        <div class="mt-4 space-x-2">
+                    <div class="mt-4 space-x-2">
+                        {% if req.status == 'open' %}
+                            <form method="POST" action="{{ url_for('accept_request', request_id=req.id) }}" class="inline">
+                                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Accepter</button>
+                            </form>
+                        {% elif req.status == 'accepted' and req.professional_id == current_user.id %}
                             <form method="POST" action="{{ url_for('resolve_request', request_id=req.id) }}" class="inline">
                                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Marquer comme Résolue</button>
                             </form>
                             <a href="{{ url_for('messages', request_id=req.id) }}" class="inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
-                        </div>
-                    {% elif req.status == 'resolved' and req.professional_id == current_user.id %}
-                        <a href="{{ url_for('messages', request_id=req.id) }}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
-                    {% endif %}
+                        {% elif req.status == 'resolved' and req.professional_id == current_user.id %}
+                            <a href="{{ url_for('messages', request_id=req.id) }}" class="inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
+                            <a href="{{ url_for('export_pdf', request_id=req.id) }}" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Exporter en PDF</a>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
         </div>

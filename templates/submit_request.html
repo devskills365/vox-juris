@@ -3,16 +3,15 @@
 {% block content %}
 <div class="container mx-auto">
     <h2 class="text-2xl font-bold mb-6">Soumettre une Demande</h2>
-    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div class="max-w-md mx-auto container-bg p-6">
         <form method="POST" enctype="multipart/form-data">
             <div class="mb-4">
                 <label for="domain" class="block text-gray-700">Domaine Juridique</label>
                 <select id="domain" name="domain" class="w-full p-2 border rounded" required>
-                    <option value="Immobilier">Immobilier</option>
-                    <option value="Famille">Famille</option>
-                    <option value="Travail">Travail</option>
-                    <option value="Pénal">Pénal</option>
-                    <option value="Autre">Autre</option>
+                    <option value="" disabled selected>Sélectionnez un domaine</option>
+                    {% for domain in expertise_domains %}
+                        <option value="{{ domain }}">{{ domain }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="mb-4">

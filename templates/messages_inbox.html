@@ -6,7 +6,7 @@
     {% if conversations %}
         <div class="grid grid-cols-1 gap-4">
             {% for conv in conversations %}
-                <a href="{{ url_for('messages', request_id=conv.id) }}" class="block bg-white p-4 rounded-lg shadow-md hover:bg-gray-50">
+                <a href="{{ url_for('messages', request_id=conv.id) }}" class="container-bg p-4">
                     <p><strong>Demande #{{ conv.id }} - {{ conv.domain }}</strong></p>
                     <p><strong>Statut :</strong> {{ conv.status }}</p>
                     <p><strong>Avec :</strong> {{ conv.professional.name if current_user.role == 'citizen' else conv.user.name }}</p>

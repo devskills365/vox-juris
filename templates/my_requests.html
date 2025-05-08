@@ -6,7 +6,7 @@
     {% if requests %}
         <div class="grid grid-cols-1 gap-4">
             {% for req in requests %}
-                <div class="bg-white p-4 rounded-lg shadow-md">
+            <div class="container-bg p-4">
                     <p><strong>Domaine :</strong> {{ req.domain }}</p>
                     <p><strong>Statut :</strong> {{ req.status }}</p>
                     <p><strong>Date :</strong> {{ req.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
@@ -31,16 +31,17 @@
                             {% endif %}
                         </div>
                     {% endif %}
-                    {% if req.status == 'accepted' %}
-                        <div class="mt-4 space-x-2">
+                    <div class="mt-4 space-x-2">
+                        {% if req.status == 'accepted' %}
                             <form method="POST" action="{{ url_for('resolve_request', request_id=req.id) }}" class="inline">
                                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Confirmer comme Résolue</button>
                             </form>
                             <a href="{{ url_for('messages', request_id=req.id) }}" class="inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
-                        </div>
-                    {% elif req.status == 'resolved' %}
-                        <a href="{{ url_for('messages', request_id=req.id) }}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
-                    {% endif %}
+                        {% elif req.status == 'resolved' %}
+                            <a href="{{ url_for('messages', request_id=req.id) }}" class="inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Messagerie</a>
+                            <a href="{{ url_for('export_pdf', request_id=req.id) }}" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Exporter en PDF</a>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
         </div>
